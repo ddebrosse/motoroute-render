@@ -1,0 +1,9 @@
+gpxpy>=1.6.2
+matplotlib>=3.8.2
+geopandas>=0.14.2
+shapely>=2.0.2
+contextily>=1.4.0
+scipy>=1.11.4
+numpy>=1.26.2
+reverse_geocoder>=1.5.1
+folium>=0.15.0
