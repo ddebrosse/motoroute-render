@@ -19,7 +19,7 @@ def get_file_hash(file_path):
 
 def load_multiple_gpx_with_stats(file_paths):
     seen_hashes = set()
-    rutas_individuales = [] # Nueva estructura para guardar geometría + metadatos por ruta
+    rutas_individuales = []
     
     total_km = 0.0
     longest_route_km = 0.0
@@ -27,16 +27,13 @@ def load_multiple_gpx_with_stats(file_paths):
 
     for path in file_paths:
         file_hash = get_file_hash(path)
-        if file_hash in seen_hashes:
-            print(f"⚠️  Ignorando duplicado: {os.path.basename(path)}")
-            continue
+        if file_hash in seen_hashes: continue
         seen_hashes.add(file_hash)
 
         try:
             with open(path, 'r', encoding='utf-8') as gpx_file:
                 gpx = gpxpy.parse(gpx_file)
 
-            # Intentar extraer la fecha de inicio de la ruta
             fecha_ruta = "Desconocida"
             if gpx.time:
                 fecha_ruta = gpx.time.strftime("%d/%m/%Y")
@@ -52,23 +49,34 @@ def load_multiple_gpx_with_stats(file_paths):
                     points = []
                     prev_point = None
                     current_segment_km = 0.0
+                    desnivel_positivo = 0.0
                     
                     for point in segment.points:
                         points.append((point.longitude, point.latitude))
                         if prev_point:
+                            # Calcular distancia
                             dist = haversine_distance(prev_point.latitude, prev_point.longitude, 
                                                       point.latitude, point.longitude)
                             current_segment_km += dist
                             total_km += dist
+                            
+                            # Calcular desnivel positivo (solo si el GPX tiene datos de altitud)
+                            if point.elevation is not None and prev_point.elevation is not None:
+                                diff = point.elevation - prev_point.elevation
+                                if diff > 0:
+                                    desnivel_positivo += diff
+                                    
                         prev_point = point
                     
                     if len(points) >= 2:
-                        # Guardamos de forma independiente cada tramo con sus datos para el HTML
                         rutas_individuales.append({
                             "geometry": LineString(points),
                             "nombre": nombre_archivo.replace('_', ' '),
                             "fecha": fecha_ruta,
-                            "km": round(current_segment_km, 1)
+                            "km": round(current_segment_km, 1),
+                            "desnivel": round(desnivel_positivo),
+                            "inicio_coords": (points[0][1], points[0][0]), # (lat, lon) para Folium
+                            "fin_coords": (points[-1][1], points[-1][0])
                         })
                         
                         if current_segment_km > longest_route_km:
