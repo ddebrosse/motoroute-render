@@ -10,9 +10,9 @@ OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
 HTML_OUTPUT_DIR = os.path.join(BASE_DIR, 'docs')
 
 # Paleta de colores estándar (OpenStreetMap)
-ROUTE_COLOR = "#D0FF00"      # Naranja intenso/cobrizo
+ROUTE_COLOR = "#FF9900"      # Naranja intenso/cobrizo
 ROUTE_LINEWIDTH = 1.5
-GLOW_COLOR = "#33FF00"
+GLOW_COLOR = "#FF6600"
 GLOW_LINEWIDTH = 4.0
 GLOW_ALPHA = 0.2             
 MARGIN_DEGREES = 0.1         
